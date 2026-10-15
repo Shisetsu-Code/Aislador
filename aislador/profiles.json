@@ -1,0 +1,674 @@
+{
+  "schema": 1,
+  "profiles": [
+    {
+      "key": "pragmatic",
+      "name": "Pragmatic Play",
+      "hosts": [
+        "demogamesfree.pragmaticplay.net"
+      ],
+      "endpoint_patterns": [
+        "^/(?:gs2c|hub-demo)/ge/v5/gameService$"
+      ],
+      "action_paths": [
+        "action"
+      ],
+      "known_actions": [
+        "doInit",
+        "doSpin",
+        "doCollect",
+        "doBonus",
+        "doMysteryScatter"
+      ],
+      "known_phases": [],
+      "known_fields": [
+        "action",
+        "symbol",
+        "c",
+        "l",
+        "index",
+        "counter",
+        "repeat",
+        "balance",
+        "balance_cash",
+        "balance_bonus",
+        "w",
+        "tw",
+        "na",
+        "fs",
+        "fsmax",
+        "fs_total",
+        "fsleft",
+        "fs_left",
+        "fsmul",
+        "rs",
+        "rs_c",
+        "rs_t",
+        "rs_more",
+        "rs_p",
+        "rsc",
+        "respins",
+        "respin",
+        "pur",
+        "puri",
+        "purtr"
+      ],
+      "protocol_status": "structured",
+      "notes": "Evidencia: pragmatic.py, pragmatic_endpoint.py. Formularios de petición/respuesta; lista parcial y conservadora, sin equivalencia acción=compra.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "1spin4win",
+      "name": "1Spin4Win",
+      "hosts": [
+        "gs.1spin4win.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [
+        "type"
+      ],
+      "known_actions": [
+        "1",
+        "2",
+        "0",
+        "3",
+        "keepalive"
+      ],
+      "known_phases": [],
+      "known_fields": [
+        "type",
+        "error",
+        "errorCode",
+        "l",
+        "b3"
+      ],
+      "protocol_status": "structured",
+      "notes": "A/u2 y JSON directo offline; init CSV entrega sólo metadata pública, play conserva columnas numéricas sin interpretar compras. CSV opaco se redacta; no se infieren opciones por cantidad de columnas.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "belatra",
+      "name": "Belatra",
+      "hosts": [
+        "free-slot.belatragames.com",
+        "demo.bltr-static.com"
+      ],
+      "endpoint_patterns": [
+        "^/game$"
+      ],
+      "action_paths": [
+        "q"
+      ],
+      "known_actions": [
+        "enter"
+      ],
+      "known_phases": [],
+      "known_fields": [
+        "d",
+        "q",
+        "uid",
+        "c",
+        "modification",
+        "ghistId",
+        "gs",
+        "gs.historyId",
+        "gs.phaseCur",
+        "gs.phaseNext",
+        "gs.nlines",
+        "gs.betPerLine",
+        "gs.gdenom"
+      ],
+      "protocol_status": "belatra_codec",
+      "notes": "AES offline opcional: requiere cryptography y config.sc capturada, vinculada por SID/origen. Si falta clave queda opaco; no se consulta red.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "bgaming",
+      "name": "BGaming",
+      "hosts": [
+        "bgaming-network.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [
+        "command",
+        "flow.command",
+        "game.action"
+      ],
+      "known_actions": [
+        "init",
+        "spin",
+        "finish",
+        "freespin",
+        "preselection_game"
+      ],
+      "known_phases": [
+        "closed"
+      ],
+      "known_fields": [
+        "command",
+        "available_commands",
+        "available_commands.*",
+        "game",
+        "game.action",
+        "game.state",
+        "flow",
+        "flow.command",
+        "flow.state",
+        "flow.available_actions",
+        "flow.available_actions.*",
+        "flow.last_action_id",
+        "outcome",
+        "outcome.storage",
+        "outcome.storage.seed"
+      ],
+      "protocol_status": "structured",
+      "notes": "Evidencia: bgaming/runtime.py:148-155,268-313,433-496,1296-1330,1444-1555. Host raíz incluye familia explícita subdominios; URL endpoint declarada por bootstrap, sin regex universal. Hyperhive no se presume JSON legible.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "ka_gaming",
+      "name": "KA Gaming",
+      "hosts": [
+        "gamesdemo.kaga88.com",
+        "rmpdemo.kaga88.com"
+      ],
+      "endpoint_patterns": [
+        "^/kaga/command/spin$",
+        "^/kaga/rmp/startGame$"
+      ],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "structured",
+      "notes": "Evidencia: ka_gaming/adapter.py:121-138 y runtime.py:129-157. RMP JSON firmado; no se inventan discriminadores ni se trata protocolo fish WS como aprendido.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "rubyplay",
+      "name": "RubyPlay",
+      "hosts": [
+        "rubyplay.com"
+      ],
+      "endpoint_patterns": [
+        "^/(?:init-session|gameserver)/demo$"
+      ],
+      "action_paths": [
+        "action"
+      ],
+      "known_actions": [
+        "init",
+        "spin",
+        "buy_feature",
+        "respin",
+        "freespin"
+      ],
+      "known_phases": [],
+      "known_fields": [
+        "v_protocol",
+        "v_math",
+        "key",
+        "device_type",
+        "funModeData",
+        "action",
+        "topic",
+        "data",
+        "data.an",
+        "data.next_action"
+      ],
+      "protocol_status": "structured",
+      "notes": "Evidencia: rubyplay/runtime.py:34-38,541-579,638-667. Host servidor dinámico server_url del launcher; rubyplay.com es identidad catálogo, no autoridad exclusiva de transporte. No generalizar a dominios no observados.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "redtiger",
+      "name": "Red Tiger",
+      "hosts": [],
+      "endpoint_patterns": [
+        "^/platform/game/(?:settings|spin|choice)$"
+      ],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [
+        "token",
+        "sessionId",
+        "playMode",
+        "gameId",
+        "userData",
+        "custom",
+        "stake",
+        "listenToFrontend",
+        "bonusId",
+        "extras",
+        "extras.features",
+        "extras.features.featureBuy",
+        "gameMode",
+        "success",
+        "result",
+        "result.game",
+        "result.user",
+        "result.user.stakes",
+        "result.user.stakes.types",
+        "result.user.stakes.types.*",
+        "result.user.stakes.defaultIndex",
+        "result.transactions",
+        "result.transactions.roundId"
+      ],
+      "protocol_status": "structured",
+      "notes": "Evidencia: redtiger/bootstrap.py:114,251-256 y runtime.py:settings_result,build_spin_payload,choice_url_from_spin_url. Hosts de juego dinámicos; games.evolution.com/cmsevo/fansite no son identidad RedTiger. Ruta de juego y esquema tienen más autoridad; no confundir NetEnt.",
+      "shared_host_endpoint_patterns": [
+        "^/platform/game/(?:settings|spin|choice)$"
+      ]
+    },
+    {
+      "key": "3oaks",
+      "name": "3 Oaks",
+      "hosts": [
+        "betman-demo.head.3oaks.com",
+        "static.3oaks.com",
+        "3oaks.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [
+        "command",
+        "action.name"
+      ],
+      "known_actions": [
+        "login",
+        "start",
+        "play",
+        "spin",
+        "buy_spin"
+      ],
+      "known_phases": [
+        "spins"
+      ],
+      "known_fields": [
+        "command",
+        "request_id",
+        "client_command_timestamp",
+        "action",
+        "action.name",
+        "action.params",
+        "set_denominator",
+        "context",
+        "context.current",
+        "context.actions",
+        "context.actions.*",
+        "context.round_finished"
+      ],
+      "protocol_status": "structured",
+      "notes": "Evidencia: three_oaks/adapter.py:177-196, runtime.py:35,43-53,123,204-218. Endpoint derivado de configuración; no regex /demo/ amplia que confunda launcher con protocolo.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "yggdrasil",
+      "name": "Yggdrasil",
+      "hosts": [
+        "demo.yggdrasilgaming.com",
+        "staticdemo.yggdrasilgaming.com"
+      ],
+      "endpoint_patterns": [
+        "^/game\\.web/service$"
+      ],
+      "action_paths": [
+        "fn",
+        "cmd"
+      ],
+      "known_actions": [
+        "play",
+        "C"
+      ],
+      "known_phases": [
+        "Finished",
+        "RESULTED"
+      ],
+      "known_fields": [
+        "fn",
+        "cmd",
+        "amount",
+        "wagerid",
+        "step",
+        "betid",
+        "code",
+        "data",
+        "data.wager",
+        "data.wager.status"
+      ],
+      "protocol_status": "structured",
+      "notes": "Evidencia: yggdrasil/protocol.py:21 y runtime.py:217-265. Comandos de opciones dinámicos permanecen novedades hasta revisión; no inferirlos por regex de compra.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "hacksaw",
+      "name": "Hacksaw Gaming",
+      "hosts": [
+        "rgs-demo.hacksawgaming.com",
+        "static-live.hacksawgaming.com"
+      ],
+      "endpoint_patterns": [
+        "^/api/play/(?:authenticate|bet)$"
+      ],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [
+        "completed"
+      ],
+      "known_fields": [
+        "seq",
+        "partner",
+        "gameId",
+        "gameVersion",
+        "currency",
+        "languageCode",
+        "mode",
+        "branding",
+        "channel",
+        "userAgent",
+        "token",
+        "statusCode",
+        "round",
+        "round.status",
+        "round.possibleActions",
+        "round.possibleActions.*",
+        "round.roundId"
+      ],
+      "protocol_status": "structured",
+      "notes": "Evidencia: hacksaw/adapter.py:142-147,198 y runtime.py:13-21. La acción está en ruta; no inventar action=bet en cuerpo.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "nolimit_city",
+      "name": "Nolimit City",
+      "hosts": [
+        "demo.nolimitcity.com",
+        "demo.nolimitcdn.com"
+      ],
+      "endpoint_patterns": [
+        "^/EjsFrontWeb/fs$",
+        "^/EjsGameWeb/ws/game$"
+      ],
+      "action_paths": [
+        "action",
+        "type"
+      ],
+      "known_actions": [
+        "open_game",
+        "normalBet",
+        "featureBet",
+        "zeroBet",
+        "gambleBet"
+      ],
+      "known_phases": [
+        "NORMAL",
+        "GAMBLE",
+        "EXTRA_SPIN",
+        "FREESPIN",
+        "FREESPIN_BETTER",
+        "FREESPIN_SUPER",
+        "SUPER_FREESPIN",
+        "RESPIN",
+        "STACKED_RESPIN_FS",
+        "STACKED_RESPIN_FREESPIN",
+        "FREESPIN_TRIGGER",
+        "COIN_SPIN",
+        "FREESPIN_PICK",
+        "FREESPIN_MINIGAME"
+      ],
+      "known_fields": [
+        "action",
+        "clientString",
+        "language",
+        "gameCodeString",
+        "key",
+        "url",
+        "init",
+        "id",
+        "error",
+        "extPlayerKey",
+        "type",
+        "bet",
+        "playerInteraction",
+        "playerInteraction.selectedIndex",
+        "playerInteraction.gambleCollected",
+        "playerInteraction.playExtraSpin",
+        "game",
+        "game.mode",
+        "game.nextMode",
+        "game.win",
+        "game.totalSpinWinnings",
+        "game.thisSpinWinning",
+        "game.thisSpinWinnings",
+        "game.accumulatedRoundWin",
+        "game.playedBetValue",
+        "game.extraSpinCost",
+        "game.freespinsLeft",
+        "game.respinsLeft",
+        "game.wasExtraSpin",
+        "game.isExtraSpin",
+        "game.isSuperFreespins",
+        "game.wasBoostedBet",
+        "game.featureBet",
+        "game.gambleOptions",
+        "game.gambleCollect",
+        "game.playerSelection",
+        "game.wasFeatureBuy",
+        "game.secondStageFsLeft",
+        "game.firstStage",
+        "game.secondStage",
+        "game.stackedSpinTriggered",
+        "pendingWin",
+        "remainingFreeSpins",
+        "features",
+        "features.active",
+        "features.available",
+        "features.available.*",
+        "balance",
+        "balances"
+      ],
+      "protocol_status": "nolimit_codec",
+      "notes": "Evidencia: nolimit_city/runtime.py:10-51,87-89,141-142,231-245,423-542. RC4/LZW depende de clave y conexión; decodificación ausente permanece pendiente. Campos de dinero y elección siempre visibles aun conocidos.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "playtech",
+      "name": "Playtech",
+      "hosts": [
+        "www.playtechone.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "games_global",
+      "name": "Games Global",
+      "hosts": [
+        "www.gamesglobal.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "amusnet",
+      "name": "Amusnet",
+      "hosts": [
+        "amusnet.com",
+        "www.amusnet.com",
+        "amusnetgaming.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "playngo",
+      "name": "Play’n GO",
+      "hosts": [
+        "www.playngo.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "greentube",
+      "name": "Greentube / Novomatic",
+      "hosts": [
+        "www.greentube.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "netent",
+      "name": "NetEnt",
+      "hosts": [
+        "netent.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. NetEnt es distinto de RedTiger; Evolution no es proveedor registrado.",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "pgsoft",
+      "name": "PG Soft",
+      "hosts": [
+        "www.pgsoft.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "blueprint",
+      "name": "Blueprint Gaming",
+      "hosts": [
+        "blueprintgaming.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "relax",
+      "name": "Relax Gaming",
+      "hosts": [
+        "www.relax-gaming.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "playson",
+      "name": "Playson",
+      "hosts": [
+        "www.playson.com",
+        "playson.com",
+        "m.playson.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "wazdan",
+      "name": "Wazdan",
+      "hosts": [
+        "wazdan.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "elk",
+      "name": "ELK Studios",
+      "hosts": [
+        "www.elk-studios.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    },
+    {
+      "key": "pushgaming",
+      "name": "Push Gaming",
+      "hosts": [
+        "www.pushgaming.com"
+      ],
+      "endpoint_patterns": [],
+      "action_paths": [],
+      "known_actions": [],
+      "known_phases": [],
+      "known_fields": [],
+      "protocol_status": "catalog_only",
+      "notes": "Evidencia: catalog_sources.py SOURCES. Sólo identidad de catálogo; sin protocolo de juego aprendido ni compras inferidas. Los hosts no acreditan endpoints demo. ",
+      "shared_host_endpoint_patterns": []
+    }
+  ]
+}

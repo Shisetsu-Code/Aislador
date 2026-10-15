@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aislador-har"
+version = "0.1.0"
+description = "Extractor offline de protocolo y novedades HAR por proveedor"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+belatra = ["cryptography>=41"]
+
+[project.scripts]
+aislador = "aislador.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["aislador*"]
+
+[tool.setuptools.package-data]
+aislador = ["profiles.json"]
