@@ -62,7 +62,7 @@ y 13 de catálogo, cuyo protocolo todavía se conserva como no aprendido.
 Cada uno tiene reglas independientes: [cobertura por proveedor](docs/PROVEEDORES.md).
 
 - JSON y formularios HTTP; WebSocket de Firefox y HardFire; cuerpos base64.
-- Nolimit City: RC4/LZW offline, con claves del propio HAR ligadas a la conexión.
+- Nolimit City: RC4/LZW offline, con claves del propio HAR ligadas a la conexión; admite capturas de navegador y de Tester-Spin con metadatos `utf8`/`utf-8`.
 - Belatra: AES offline opcional, con configuración y sesión capturadas.
 - 1Spin4Win: envelope A/u2, CSV posicional y JSON; init sin identificadores privados.
 - Imágenes, fuentes, atlas, Spine, traducciones, audio embebido y telemetría conocidos pasan al inventario de contexto.
@@ -110,3 +110,12 @@ Tkinter, incluido normalmente con Python en Windows.
 Las primitivas conocidas se contrastaron con código del repositorio
 [Tester-Spin](https://github.com/Shisetsu-Code/Tester-Spin). Aislador funciona
 independientemente y no importa ni necesita instalar Tester-Spin.
+
+
+## Aprendizaje aplicado a Tester-Spin
+
+El flujo utilizado está documentado en [APRENDIZAJE.md](docs/APRENDIZAJE.md).
+Se agrupan mensajes y bloqueos por familia; el cliente de la misma versión
+aporta los enlaces de acciones y campos. Después se implementa una primitiva
+compartida, se contrasta el corpus y se ejecutan demos nuevas representativas.
+El extractor no convierte sus hallazgos en reglas ejecutables automáticamente.

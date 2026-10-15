@@ -145,3 +145,14 @@ class NolimitLateAttachBoundaryTests(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 
+
+
+class TesterSpinWriterEncodingTests(unittest.TestCase):
+    def test_explicit_utf8_metadata_preserves_rc4_and_received_json(self):
+        doc={'log':{'entries':[bootstrap()]}}
+        for encoding in ('utf8','utf-8'):
+            fs=[frame('sent',encoding=encoding),frame('received',direction='received',payload='lzw:{"id":"1","init":"ok"}',encoding=encoding)]
+            result=nolimit.decode_frames(doc,fs)
+            self.assertEqual(result['sent']['data']['type'],'init')
+            self.assertEqual(result['received']['data']['init'],'ok')
+            self.assertIsNone(result['sent']['issue'])

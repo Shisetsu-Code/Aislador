@@ -77,7 +77,7 @@ def _text(content, limit=MAX_BODY):
     encoding = content.get('encoding')
     if encoding == 'base64':
         value = base64.b64decode(value, validate=True).decode('utf-8')
-    elif encoding not in (None, ''):
+    elif encoding not in (None, '', 'utf8', 'utf-8'):
         raise ValueError('invalid_frame')
     if len(value) > limit:
         raise ValueError('invalid_frame')
