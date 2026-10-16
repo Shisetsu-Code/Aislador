@@ -10,6 +10,7 @@ requires-python = ">=3.11"
 
 [project.optional-dependencies]
 belatra = ["cryptography>=41"]
+capture = ["playwright>=1.45,<2"]
 
 [project.scripts]
 aislador = "aislador.cli:main"

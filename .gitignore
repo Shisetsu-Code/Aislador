@@ -9,3 +9,4 @@ salidas/
 *.har
 *.har.gz
 *knowledge*.json
+*.private.json

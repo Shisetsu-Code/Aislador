@@ -1,6 +1,9 @@
 # Del HAR a una primitiva comprobada
 
-Aislador se usa offline. Tester-Spin ejecuta pruebas demo nuevas por separado;
+El análisis de Aislador es offline; `capture` obtiene HAR en sesiones demo nuevas
+y ejecuta ese análisis automáticamente, con cola reanudable y agrupación entre
+capturas. La captura inicial no ejecuta apuestas ni descubre por sí sola bonus
+que requieren interacción. Tester-Spin ejecuta pruebas demo nuevas por separado;
 no se reutilizan las sesiones de los HAR.
 
 1. Extraer las capturas pendientes por proveedor y agrupar firmas de

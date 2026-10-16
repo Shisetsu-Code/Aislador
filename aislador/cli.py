@@ -66,6 +66,14 @@ def parser():
     sub=p.add_subparsers(dest='command',required=True)
     sub.add_parser('providers',help='mostrar perfiles y cobertura real')
     sub.add_parser('gui',help='abrir la ventana local')
+    cap=sub.add_parser('capture',help='capturar demos nuevas, guardar HAR y aislarlos automáticamente')
+    cap.add_argument('urls',nargs='*');cap.add_argument('--demo',action='store_true',required=True)
+    cap.add_argument('--tester-spin-db',type=Path,help='leer candidatos pendientes del catálogo de Tester-Spin')
+    cap.add_argument('--handoff-data-root',type=Path,help='guardar observaciones para Tester-Spin (por defecto junto a su base)')
+    cap.add_argument('--provider',default='auto',choices=['auto',*get_profiles()])
+    cap.add_argument('--out',type=Path,default=Path('.local/capturas'))
+    cap.add_argument('--seconds',type=int,default=12);cap.add_argument('--max-games',type=int,default=5)
+    cap.add_argument('--headed',action='store_true',help='mostrar la ventana de captura')
     ex=sub.add_parser('extract',help='extraer uno o varios HAR')
     ex.add_argument('paths',nargs='+');ex.add_argument('--provider',default='auto',choices=['auto',*get_profiles()])
     ex.add_argument('--out',type=Path,default=Path('salidas'));ex.add_argument('--knowledge',type=Path)
@@ -87,6 +95,13 @@ def main(argv=None):
         elif args.command=='gui':
             from .gui import main as gui_main
             gui_main();return 0
+        elif args.command=='capture':
+            from .capture import capture_batch,tester_spin_urls
+            if args.tester_spin_db and (args.urls or args.provider=='auto'):
+                raise ValueError('La selección por catálogo requiere proveedor explícito y no admite URLs simultáneas.')
+            urls=tester_spin_urls(args.tester_spin_db,args.provider,None) if args.tester_spin_db else args.urls
+            result=capture_batch(urls,args.out,provider=args.provider,seconds=args.seconds,max_games=args.max_games,headed=args.headed,
+                tester_spin_database=args.tester_spin_db,handoff_data_root=args.handoff_data_root)
         elif args.command=='extract':
             files=[]
             for raw in args.paths:
@@ -107,7 +122,8 @@ def main(argv=None):
                     if row.get('ref')==args.ref:result=row;break
             if result is None:raise ValueError('Referencia no encontrada en ese informe.')
         else:result=review_pattern(args.patterns,args.pattern,args.note,args.knowledge)
-        print(json.dumps(result,ensure_ascii=True,indent=2));return 0
+        print(json.dumps(result,ensure_ascii=True,indent=2))
+        return 1 if args.command=='capture' and any(j['status']=='error' for j in result['jobs']) else 0
     except (OSError,ValueError,TypeError,KeyError,RecursionError) as exc:
         print('No se pudo completar: '+str(exc),file=sys.stderr);return 2
 

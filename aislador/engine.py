@@ -5,6 +5,7 @@ from urllib.parse import urlsplit,parse_qsl
 from .har import validate,body_text,parse_body,frames_from,MAX_BODY,pairs_object
 from .profiles import get_profiles,detect_provider
 from .sanitize import clean,safe_url,digest
+from .codecs.playtech import is_gpas_socket,decode_message as decode_gpas_message
 
 TELEMETRY=('google-analytics.com','googletagmanager.com','posthog.com','sentry.io','doubleclick.net','vitals.vercel-insights.com','analytics.nolimitcity.com','analytics.google.com')
 SIGNAL=re.compile(r'action|command|mode|phase|next|select|choice|option|feature|buy|purchase|ante|extra|gamble|collect|balance|stake|bet|win|price|cost|error|multiplier|counter|remain',re.I)
@@ -61,6 +62,9 @@ def _domains(value,prefix='',depth=0):
 
 
 def _action(profile,request,url):
+    if is_gpas_socket(url):
+        value=_get(request,'data._type')
+        if isinstance(value,str):return value
     paths=(['content.type'] if profile.get('key')=='nolimit_city' else [])+profile.get('action_paths',[])+['content.type','action','command','cmd','type','method']
     for path in dict.fromkeys(paths):
         value=_get(request,path)
@@ -81,6 +85,7 @@ def _asset_kind(entry):
     if req.get('method','GET').upper() not in ('GET','HEAD') or req.get('postData'):return None
     if any(part in mime for part in ('javascript','ecmascript')) or urlsplit(url).path.endswith(('.js','.mjs')):return 'client_script'
     path=urlsplit(url).path
+    if host=='cachedownload.playtechone.com' and re.search(r'/(?:dt_)?texts_[A-Za-z_-]+\.jmm$',path):return 'ui_translations'
     if host=='playin.com' and (path in ('/api/games','/api/studios','/api/announcements') or path.startswith('/_next/data/')):return 'catalog_context'
     if re.search(r'/translations/[^/]+\.json$',path) or path=='/messages/messages.json':return 'ui_translations'
     if path.endswith(('.fnt','.mustache','.atlas','.shapes.txt')):return 'ui_template'
@@ -102,7 +107,7 @@ def _asset_kind(entry):
 
 
 def _profile(provider,url,payload):
-    key=provider if provider!='auto' else detect_provider(url,payload)
+    key=provider if provider!='auto' else ('playtech' if is_gpas_socket(url) else detect_provider(url,payload))
     return key or 'unknown',get_profiles().get(key,{})
 
 
@@ -178,6 +183,7 @@ def _pair_ws(events):
     for event in events:
         if event['transport']!='websocket':continue
         data=event.get('data');identifier=data.get('id') if isinstance(data,dict) else None
+        if isinstance(data,dict) and is_gpas_socket(event['url']):identifier=data.get('correlationId')
         if isinstance(identifier,(str,int)):
             key=(event['connection'],str(identifier))
             if event['direction']=='sent':
@@ -201,6 +207,10 @@ def analyze(document,*,provider='auto',knowledge=None,source_name='',source_sha2
     if provider!='auto' and provider not in get_profiles():raise ValueError('Proveedor no registrado: '+provider)
     knowledge=set(knowledge or []);events=[];context=[];excluded=collections.Counter();warnings=[]
     entries=document['log']['entries']
+    acquisition=document['log'].get('_aisladorCapture')
+    if isinstance(acquisition,dict):
+        warnings.extend('CAPTURE:'+str(clean(w)) for w in acquisition.get('warnings',[]) if isinstance(w,str))
+        warnings.append('BOOTSTRAP_CAPTURE_NOT_GAMEPLAY_COVERAGE')
     belatra={}
     try:
         from .codecs.belatra import decode_entries
@@ -250,6 +260,10 @@ def analyze(document,*,provider='auto',knowledge=None,source_name='',source_sha2
     for frame in frames:
         url=frame['url'];key,profile=_profile(provider,url,{})
         result=decoded.get(frame['ref']);issues=list(frame.get('issues',[]));payload=frame['payload'];data=None
+        if is_gpas_socket(url) and isinstance(payload,str) and payload in ('1::','2::'):
+            excluded['transport_control']+=1
+            context.append({'ref':frame['ref'],'kind':'transport_control','url':safe_url(url),'direction':frame['direction'],'control':payload})
+            continue
         if result:
             data=result['data']
             if result['issue']:issues.append('NOLIMIT_'+result['issue'].upper())
@@ -258,8 +272,10 @@ def analyze(document,*,provider='auto',knowledge=None,source_name='',source_sha2
                 try:payload=base64.b64decode(payload,validate=True).decode('utf-8')
                 except (ValueError,UnicodeError):payload=None
             if payload is not None:
-                try:data=json.loads(payload)
-                except (ValueError,TypeError):pass
+                if is_gpas_socket(url):data=decode_gpas_message(payload)
+                if data is None:
+                    try:data=json.loads(payload)
+                    except (ValueError,TypeError):pass
         if data is None and key=='1spin4win':
             from .codecs.one_spin import decode_message
             data=decode_message(payload)
@@ -324,4 +340,8 @@ def write_bundle(result,destination):
         with (destination/filename).open('w',encoding='utf-8') as stream:
             for row in result[key]:stream.write(json.dumps(row,ensure_ascii=True)+'\n')
     (destination/'resumen.md').write_text(markdown(result),encoding='utf-8')
+    from .codecs.playtech import evidence_report
+    report=evidence_report(result)
+    if report is not None:
+        (destination/'protocol-evidence.json').write_text(json.dumps(clean(report),ensure_ascii=True,indent=2)+'\n',encoding='utf-8')
     return destination
