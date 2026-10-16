@@ -85,7 +85,7 @@ def _asset_kind(entry):
     if req.get('method','GET').upper() not in ('GET','HEAD') or req.get('postData'):return None
     if any(part in mime for part in ('javascript','ecmascript')) or urlsplit(url).path.endswith(('.js','.mjs')):return 'client_script'
     path=urlsplit(url).path
-    if host=='cachedownload.playtechone.com' and re.search(r'/(?:dt_)?texts_[A-Za-z_-]+\.jmm$',path):return 'ui_translations'
+    if host in ('cachedownload.playtechone.com','gpas-games.playtechone.com') and re.search(r'/(?:gpas_|dt_)?texts(?:_popups)?(?:_[A-Za-z_-]+)?\.jmm$',path):return 'ui_translations'
     if host=='playin.com' and (path in ('/api/games','/api/studios','/api/announcements') or path.startswith('/_next/data/')):return 'catalog_context'
     if re.search(r'/translations/[^/]+\.json$',path) or path=='/messages/messages.json':return 'ui_translations'
     if path.endswith(('.fnt','.mustache','.atlas','.shapes.txt')):return 'ui_template'

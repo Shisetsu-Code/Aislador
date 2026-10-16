@@ -13,6 +13,17 @@ def capture(payloads, url=HOST):
 
 
 class PlaytechTests(unittest.TestCase):
+    def test_gpas_text_assets_leave_configs_and_errors_visible(self):
+        def asset(name,status=200,method='GET'):
+            return {'request':{'method':method,'url':'https://gpas-games.playtechone.com/resources/'+name},
+                    'response':{'status':status,'content':{'mimeType':'application/json','text':'{"resources":{}}'}}}
+        r=analyze({'log':{'entries':[asset('texts_en.jmm'),asset('gpas_texts_en.jmm'),
+            asset('texts_popups_en.jmm'),asset('texts.jmm'),asset('game.unknown.jmm'),
+            asset('game.default.jmm'),asset('texts_en.jmm',500),asset('texts_en.jmm',method='POST')]}})
+        self.assertEqual(r['summary']['excluded']['ui_translations'],4)
+        self.assertEqual(len(r['events']),4)
+        self.assertIn('HTTP_ERROR',r['events'][2]['issues'])
+
     def test_socketio_decodes_and_preserves_choices_and_errors(self):
         data = {'data': {'_type': 'com.pt.casino.platform.game.GameCommand',
                         'gameData': {'choices': [0, 1], 'nextRound': 'PICK'},
