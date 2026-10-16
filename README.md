@@ -192,3 +192,23 @@ La cola por catálogo aplica el límite después de omitir capturas terminadas:
 cada lote avanza a candidatos nuevos. La carpeta se bloquea durante la operación
 para impedir capturas duplicadas de dos procesos. El bloqueo se libera al salir
 el proceso, incluso si se interrumpe.
+
+## Capturas automáticas tras ERROR/PARCIAL
+
+Tester-Spin puede iniciar `follow-failures` al guardar un resultado ERROR o
+PARCIAL. El trabajador consulta la base en modo de sólo lectura, toma una
+captura pasiva nueva por resultado y deja `revision.json` con los informes por
+revisar. Un fallo posterior del mismo juego recibe otro HAR; reintentar sólo el
+análisis reutiliza la captura de ese resultado. Los OK no disparan capturas.
+Un resultado más reciente reemplaza solicitudes anteriores pendientes del juego.
+
+```powershell
+python -m aislador follow-failures --tester-spin-db "C:\Proyectos\Tester-Spin\data\tester-spin.sqlite3" --out .local/fallos --after-id 100 --seconds 12
+```
+
+`--after-id` fija el punto de inicio para no descargar el historial entero; la
+cola conserva su cursor. `--once` procesa un lote y termina. El modo trabajador
+mantiene vivos los reintentos pendientes (hasta tres intentos, separados por
+cinco minutos) y finaliza tras quedar inactivo. Una captura sin protocolo útil
+no equivale a cobertura ni produce reglas ejecutables. El análisis de primitivas
+sigue siendo trabajo de revisión; no se instala código desde un HAR.

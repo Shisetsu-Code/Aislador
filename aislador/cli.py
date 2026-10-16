@@ -66,6 +66,12 @@ def parser():
     sub=p.add_subparsers(dest='command',required=True)
     sub.add_parser('providers',help='mostrar perfiles y cobertura real')
     sub.add_parser('gui',help='abrir la ventana local')
+    follow=sub.add_parser('follow-failures',help='capturar y filtrar nuevos ERROR/PARCIAL de Tester-Spin')
+    follow.add_argument('--tester-spin-db',type=Path,required=True)
+    follow.add_argument('--out',type=Path,required=True)
+    follow.add_argument('--after-id',type=int,default=0)
+    follow.add_argument('--seconds',type=int,default=12)
+    follow.add_argument('--once',action='store_true')
     cap=sub.add_parser('capture',help='capturar demos nuevas, guardar HAR y aislarlos automáticamente')
     cap.add_argument('urls',nargs='*');cap.add_argument('--demo',action='store_true',required=True)
     cap.add_argument('--tester-spin-db',type=Path,help='leer candidatos pendientes del catálogo de Tester-Spin')
@@ -95,6 +101,10 @@ def main(argv=None):
         elif args.command=='gui':
             from .gui import main as gui_main
             gui_main();return 0
+        elif args.command=='follow-failures':
+            from .failures import drain_failures,follow_failures
+            fn=drain_failures if args.once else follow_failures
+            result=fn(args.tester_spin_db,args.out,after_id=args.after_id,seconds=args.seconds)
         elif args.command=='capture':
             from .capture import capture_batch,tester_spin_urls
             if args.tester_spin_db and (args.urls or args.provider=='auto'):
